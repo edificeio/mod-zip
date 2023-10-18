@@ -3,6 +3,11 @@
 pipeline {
   agent any
     stages {
+      stage("Initialization") {
+        steps {
+          buildName "${GIT_BRANCH}"
+        }
+      }
       stage('Build') {
         steps {
           checkout scm
