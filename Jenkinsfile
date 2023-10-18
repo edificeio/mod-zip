@@ -5,8 +5,10 @@ pipeline {
     stages {
       stage("Initialization") {
         steps {
-          def version = sh(returnStdout: true, script: 'docker-compose run --rm maven mvn $MVN_OPTS help:evaluate -Dexpression=project.version -q -DforceStdout')
-          buildName "${env.BRANCH_NAME}@${version}"
+          script {
+            def version = sh(returnStdout: true, script: 'docker-compose run --rm maven mvn $MVN_OPTS help:evaluate -Dexpression=project.version -q -DforceStdout')
+            buildName "${env.BRANCH_NAME}@${version}"
+          }
         }
       }
       stage('Build') {
