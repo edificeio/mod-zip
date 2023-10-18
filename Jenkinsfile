@@ -7,7 +7,7 @@ pipeline {
         steps {
           script {
             def version = sh(returnStdout: true, script: 'docker-compose run --rm maven mvn $MVN_OPTS help:evaluate -Dexpression=project.version -q -DforceStdout')
-            buildName "${env.BRANCH_NAME}@${version}"
+            buildName "${env.GIT_BRANCH.replace("origin/", "")}@${version}"
           }
         }
       }
