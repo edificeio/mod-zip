@@ -18,6 +18,7 @@ package fr.wseduc.zip;
 
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
+import io.vertx.core.file.FileSystemException;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.vertx.java.busmods.BusModBase;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -49,56 +51,60 @@ public class Zipper extends BusModBase implements Handler<Message<JsonObject>> {
 
 	@Override
 	public void handle(Message<JsonObject> message) {
-		final Object path = message.body().getValue("path");
-		if (path == null) {
-			sendError(message, "Source path is null.");
-			return;
-		}
-		JsonArray paths;
-		if (path instanceof JsonArray) {
-			paths = (JsonArray) path;
-		} else if (path instanceof String) {
-			paths = new JsonArray().add(path);
-		} else {
-			sendError(message, "Invalid path type.");
-			return;
-		}
-		final String zipName = message.body().getString("zipFile", generateTmpFileName());
-		final boolean deletePath = message.body().getBoolean("deletePath", false);
-		final int level = message.body().getInteger("level", Deflater.BEST_SPEED);
-		if (vertx.fileSystem().existsBlocking(zipName)) {
-			sendError(message, "Zip file already exists.");
-			return;
-		}
-		for (Object o : paths) {
-			if (!vertx.fileSystem().existsBlocking(o.toString())) {
-				sendError(message, "Source path doesn't exists : " + o);
-				return;
+		vertx.executeBlocking((Callable<Void>) () -> {
+			final Object path = message.body().getValue("path");
+			if (path == null) {
+				sendError(message, "Source path is null.");
+				return null;
 			}
-		}
-		if (level < 0 || level > 9) {
-			sendError(message, "Level value must be 0-9");
-			return;
-		}
-		try {
-			zipData(paths, zipName, level);
-			if (deletePath) {
-				try
-				{
-					for (Object o : paths) {
-						vertx.fileSystem().deleteRecursiveBlocking(o.toString(), true);
-					}
-				} catch(io.vertx.core.file.FileSystemException e)
-				{
-					logger.error(e.getMessage(), e);
-					// Don't send an error if the delete fails
+			JsonArray paths;
+			if (path instanceof JsonArray) {
+				paths = (JsonArray) path;
+			} else if (path instanceof String) {
+				paths = new JsonArray().add(path);
+			} else {
+				sendError(message, "Invalid path type.");
+				return null;
+			}
+			final String zipName = message.body().getString("zipFile", generateTmpFileName());
+			final boolean deletePath = message.body().getBoolean("deletePath", false);
+			final int level = message.body().getInteger("level", Deflater.BEST_SPEED);
+			if (vertx.fileSystem().existsBlocking(zipName)) {
+				sendError(message, "Zip file already exists.");
+				return null;
+
+			}
+			for (Object o : paths) {
+				if (!vertx.fileSystem().existsBlocking(o.toString())) {
+					sendError(message, "Source path doesn't exists : " + o);
+					return null;
 				}
 			}
-			sendOK(message, new JsonObject().put("destZip", zipName));
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-			sendError(message, e.getMessage());
-		}
+			if (level < 0 || level > 9) {
+				sendError(message, "Level value must be 0-9");
+				return null;
+			}
+			try {
+				zipData(paths, zipName, level);
+				if (deletePath) {
+					try
+					{
+						for (Object o : paths) {
+							vertx.fileSystem().deleteRecursiveBlocking(o.toString(), true);
+						}
+					} catch(FileSystemException e)
+					{
+						logger.error(e.getMessage(), e);
+						// Don't send an error if the delete fails
+					}
+				}
+				sendOK(message, new JsonObject().put("destZip", zipName));
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+				sendError(message, e.getMessage());
+			}
+			return null;
+		}, false);
 	}
 
 	private String generateTmpFileName() {
