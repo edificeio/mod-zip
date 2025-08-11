@@ -1,3 +1,10 @@
+# À propos de mod-zip
+    
+* Licence : [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0) - Copyright Edifice
+* Financeur(s) : Edifice
+* Développeur(s) : Edifice
+* Description : module asynchrone de gestion d'archives zip pour Vertx.
+
 # Vert.x Zip Module
 
 Simple worker module that given the file path of a file or directory, zip it returns the filename in a Json message
