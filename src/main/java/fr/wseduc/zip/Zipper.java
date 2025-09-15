@@ -44,7 +44,7 @@ public class Zipper extends BusModBase implements Handler<Message<JsonObject>> {
 		super.start();
 		JsonObject conf = config;
 		String address = conf.getString("address", "zipper");
-		eb.consumer(address, this);
+		eb.localConsumer(address, this);
 	}
 
 	@Override
