@@ -11,10 +11,10 @@
 
   <groupId>fr.wseduc</groupId>
   <artifactId>mod-zip</artifactId>
-  <version>3.1-zookeeper-SNAPSHOT</version>
+  <version>3.2-SNAPSHOT</version>
 
   <properties>
-    <web-utils.version>3.2-zookeeper-SNAPSHOT</web-utils.version>
+    <web-utils.version>3.3-SNAPSHOT</web-utils.version>
     <jacksonDatabindVersion>2.15.2</jacksonDatabindVersion>
   </properties>
 
