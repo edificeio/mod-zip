@@ -8,22 +8,18 @@
     <artifactId>app-parent</artifactId>
     <version>1.2.1</version>
   </parent>
-
   <groupId>fr.wseduc</groupId>
   <artifactId>mod-zip</artifactId>
-  <version>3.2-SNAPSHOT</version>
-
+  <version>3.2-separation-SNAPSHOT</version>
   <properties>
     <web-utils.version>3.3-SNAPSHOT</web-utils.version>
     <jacksonDatabindVersion>2.15.2</jacksonDatabindVersion>
   </properties>
-
   <scm>
     <connection>scm:git:https://github.com/opendigitaleducation/mod-zip.git</connection>
     <developerConnection>scm:git:https://github.com/opendigitaleducation/mod-zip.git</developerConnection>
     <url>https://github.com/opendigitaleducation/mod-zip</url>
   </scm>
-
   <repositories>
     <repository>
       <id>ode</id>
@@ -31,7 +27,6 @@
       <url>https://maven.opendigitaleducation.com/nexus/content/groups/public</url>
     </repository>
   </repositories>
-
   <dependencies>
     <dependency>
       <groupId>io.vertx</groupId>
